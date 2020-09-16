@@ -5,7 +5,7 @@ re2="^(.+)\/([^/]+)$"
 #inputerror="Input error, check your parameters"
 exitcode=0
 
-help()
+help() #Need to work on
 {
     echo "Script Author - Anikeev Fedor M3209";
     echo
@@ -65,8 +65,9 @@ elif [[ "$whichp" == "-reverse" ]]; then # hard, need to think
 elif [[ "$whichp" == "-strlen" ]]; then # Simple enough...
     echo ${#2}
 elif [[ "$1" == "-log" ]]; then # lutuiy kek
-    source log.sh 2>&-
-    [[ $? -eq 0 ]] && logsourced=0 || echo "Source log.sh is not loaded, you can not use -log command"; exit 100
+    echo "Log command is not yet available"
+    #source log.sh 2>&-
+    #[[ $? -eq 0 ]] && logsourced=0 || echo "Source log.sh is not loaded, you can not use -log command"; exit 100
 
 elif [[ "$whichp" == "exit" ]]; then
     if [[ $2 =~ $re ]]; then
