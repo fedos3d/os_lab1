@@ -88,8 +88,8 @@ runreverse()
 
 runlog()
 {
-    echo "Log command is not yet available"
-    #source log.sh 2>&-
+    #echo "Log command is not yet available"
+    source log.sh
     #[[ $? -eq 0 ]] && logsourced=0 || echo "Source log.sh is not loaded, you can not use -log command"; exit 100
 }
 
