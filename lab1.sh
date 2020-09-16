@@ -41,6 +41,7 @@ whichp=$1
 calcsourced=1
 searchsourced=1
 reversesourced=1
+logsourced=1
 
 if [[ "$whichp" = ="-calc" ]]; then # gotta optimize param check for calc
     whichcalc=$2
@@ -64,7 +65,9 @@ elif [[ "$whichp" == "-reverse" ]]; then # hard, need to think
 elif [[ "$whichp" == "-strlen" ]]; then # Simple enough...
     echo ${#2}
 elif [[ "$1" == "-log" ]]; then # lutuiy kek
-    echo "Ne nu a cho..."
+    source log.sh 2>&-
+    [[ $? -eq 0 ]] && logsourced=0 || echo "Source log.sh is not loaded, you can not use -log command"; exit 100
+
 elif [[ "$whichp" == "exit" ]]; then
     if [[ $2 =~ $re ]]; then
         if [[ "$2" -ge "0" && "$2" -le "244" ]]; then
