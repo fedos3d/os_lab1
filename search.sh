@@ -13,9 +13,9 @@ else
         grep -r $pattern $foldername 2>&-
         [[ $? -eq 2 ]] && echo "No such folder"
         [[ $? -eq 1 ]] && echo "There are no strings matching your pattern"
-        exit 0
+        
     else
         echo $searcherror #can I use grep here?
-        exit 0
+        
     fi
 fi
