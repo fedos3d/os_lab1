@@ -3,8 +3,19 @@
 
 foldername=$1
 pattern=$2
-searcherror="You have entered wrong folder path or patter, please check folder path format using help command"
+searcherror="You have entered wrong folder path or pattern, please check folder path format using help command"
 
 path="^(.+)\/([^\/]+)$"
-
-[[ $foldername =~ $path ]] && grep -r $pattern $foldername || echo $searcherror
+if [ -z "$pattern" ]; then
+    echo "You have entered empty pattern"
+else
+    if [[ $foldername =~ $path ]]; then
+        grep -r $pattern $foldername 2>&-
+        [[ $? -eq 2 ]] && echo "No such folder"
+        [[ $? -eq 1 ]] && echo "There are no strings matching your pattern"
+        exit 0
+    else
+        echo $searcherror #can I use grep here?
+        exit 0
+    fi
+fi

@@ -1,56 +1,57 @@
 # !/bin/bash
 
-#Rewrtie using bc |
+#Do i need here functions? or i can rewrite calc.sh without functions, because they are litterly just one string.
 
-inputnumbererror="Input error, check your parameters"
 whichcalc=$1
 num_1=$2
 num_2=$3
+
+inputnumbererror="Input error, your parameters are not numbers, please refer to help"
+nosuchcalccommand="There is no such a calc command, please refer to the help"
+
 re="^[+-]?[0-9]+$"
 
-no_such_calc_command() {
-    echo "There is no such a calc command, please refer to the help"
-}
 
-sum() {
-    sum=$(($num_1 + $num_2))     
-    echo $sum    
+sum() {     
+    echo "$num_1 + $num_2" | bc
 }
 
 sub() {
-    sub=$(($num_1 - $num_2))
-    echo $sub
+    echo "$num_1 - $num_2" | bc
 }
 mul() {
-    mul=$(($num_1 * $num_2))
-    echo $mul
+    echo "$num_1 * $num_2" | bc
 }
 div() {
     if [[ $num_2 = 0 ]]; then #Here we check if second param is not zero
         echo "Input error, You can't divide by zero"
     else
-        echo "$num_1 / $num_2" | bc -l
+        echo "$num_1 / $num_2" | bc -l | perl -pe '/\./ && s/0+$/$1/ && s/\.$//' #Is it okay that i used perl there?
     fi    
     
 }
-if [[ $num_1 =~ $re  &&  $num_2 =~ $re ]]; then #Here we check if params are numbers
-    case $whichcalc in
-        sum)
-            sum
-            ;;
-        sub)
-            sub
-            ;;
-        mul)
-            mul
-            ;;
-        div)
-            div
-            ;; 
-        *)
-        no_such_calc_command
-        ;;
-        esac       
+if [[ "$whichcalc" = "sum" || "$whichcalc" = "sub" || "$whichcalc" = "mul" || "$whichcalc" = "div" ]]; then
+    if [[ -z "$num_1" || -z "$num_2" ]]; then
+            echo "One or both of your numbers are empty strings, please refer to help for more infomation"
+    elif [[ $num_1 =~ $re  &&  $num_2 =~ $re ]]; then #Here we check if params are numbers
+            case $whichcalc in
+                sum)
+                    sum
+                    ;;
+                sub)
+                    sub
+                    ;;
+                mul)
+                    mul
+                    ;;
+                div)
+                    div
+                    ;; 
+            esac
+    
+    else
+        echo $inputnumbererror
+    fi       
 else
-    echo $inputnumbererror        
+    echo $nosuchcalccommand      
 fi
