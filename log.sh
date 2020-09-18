@@ -24,7 +24,7 @@ if [[ -f "$logfile" ]]; then
     IFS=$'\n'  
 
     for line in $(cat $logfile); do
-    if [[ $line =~ $informationreg && ! $line =~ $exception2 ]] && echo -e "${blue}$line"
+        [[ $line =~ $informationreg && ! $line =~ $exception2 ]] && echo -e "${blue}$line"
     done
 
     NC='\033[0m' #No color
