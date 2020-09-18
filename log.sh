@@ -1,7 +1,7 @@
 # !/bin/bash
 
-#Tasks to do:
 #Need to add code which can show more then oneline string?????
+#excludereg="((\+\+)|(\!\!)|(\-\-)|(\*\*)|(\=\=)|(EE)|(NI)|(\?\?))$"
 
 logfile="X.log"
 warningreg="(WW)"
@@ -9,12 +9,10 @@ informationreg="(II)"
 excetion1="(EE)"
 exception2="(!!)"
 
-#excludereg="((\+\+)|(\!\!)|(\-\-)|(\*\*)|(\=\=)|(EE)|(NI)|(\?\?))$"
+yellow='\033[1;33m' #Yellow color
+blue='\033[1;34m' #Blue color
 
-yellow='\033[1;33m'
-blue='\033[1;34m'
-
-mem=$IFS
+mem=$IFS #Store default IFS value
 
 IFS=$'\n' 
 
@@ -35,7 +33,7 @@ if [[ $line =~ $informationreg && ! $line =~ $exception2 ]]; then
     echo -e "${blue}$line"
 fi
 done
-NC='\033[0m'
+NC='\033[0m' #No color
 echo -e "$NC"
 IFS=$mem
 return 0

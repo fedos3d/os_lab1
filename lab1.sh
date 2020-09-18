@@ -1,11 +1,7 @@
 # !/bin/bash
 
 #Tasks to do:
-#Check source onlt once, in the begging of programm and store result in array.
 #log command prints only line containing warning and info alias, is it okay?
-#interactive search,reverse does not work...
-#exit codes need polishing
-#help command needs polishing
 #overall polising: rewrite if statement in shirt form, bash butifier
 
 whichp=$1 #Var responsible for command
@@ -31,19 +27,19 @@ modulenotloadedinter="$modulenotloaded$returnmes"
 #function runs help command
 help()
 {
-    echo "Script Author - Anikeev Fedor M3209";
+    echo "  Script Author - Anikeev Fedor M3209";
     echo
-    echo "You can use the following commands:"
+    echo "  You can use the following commands:"
     echo
     echo "          -calc : allows you to calculate 2 numbers"
-    echo "              usage: -sum/sub/mul/div int1 int2"
-    echo "              3 and 4th params are numbers (!integers!)"
+    echo "              usage: -sum/-sub/-mul/-div int1 int2"
+    echo "                  3 and 4th params are numbers (!integers! Do not use plus sign with numbers (-4 - ok, 6 - ok, +7 - not ok))"
     echo
-    echo "          -search : command does a recurrent search for string with your pattern"
+    echo "          -search : command does a recurrent search for a string with your pattern"
     echo "              usage: -search folderpath pattern"
     echo
-    echo "          -reverse : "
-    echo "              usage: -reverse filetoreverse filewheretostore"
+    echo "          -reverse : reverse order of every character in file and prints it to other file"
+    echo "              usage: -reverse inputfile outputfile"
     echo
     echo "          -strlen : calulates length of the string"
     echo "              usage: -stlen yourstring"
@@ -58,10 +54,19 @@ help()
     echo "          -interactive: enables interactive mode"
     echo
     echo "          exit codes description:"
+    echo "              general:"
     echo "              100 - module was not loaded"
-    echo "              150 - file was not found"
+    echo "              35 - one or more parameters required were not provided"
+    echo "              150 - file or folder was not found"
     echo "              0 - succes"
     echo "              10 - no such command"
+    echo "              calc command specific:"
+    echo "              15 - no such calc command"
+    echo "              18 - one or both params are not numbers"
+    echo "              19 - dividing by zero"
+    echo "              search command specific:"
+    echo "              25 - no strings found"
+    return 0
 }
 
 #function that checks if file ca be loaded
@@ -86,7 +91,6 @@ runsearch()
     foldername=$1
     pattern=$2
     source $searchsource $foldername $pattern
-
 }
 
 #functions that runs reverse command
@@ -121,6 +125,22 @@ exitt()
 runstrlen()
 {
     echo ${#1} #How does it work?
+}
+
+interactive_mode_menu()
+{
+    echo
+    echo "You are now in interactive mode!"
+    echo
+    echo "Please enter a letter to run a command: "
+    echo "c - starts calulator"
+    echo "s - starts search"
+    echo "h - starts help"
+    echo "r - starts reverse"
+    echo "len - starts strlen"
+    echo "l - starts log"
+    echo "e - promts you to enter exit code and finish program"
+    echo "Enter your command: "
 }
 
 if [[ "$whichp" == "-calc" ]]; then   
@@ -175,18 +195,7 @@ elif [[ "$whichp" == "-interactive" ]]; then
     ever=0
     while [ $ever -eq 0 ]  
     do
-    echo
-    echo "You are now in interactive mode!"
-    echo
-    echo "Please enter a letter to run a command: "
-    echo "c - starts calulator"
-    echo "s - starts search"
-    echo "h - starts help"
-    echo "r - starts reverse"
-    echo "len - starts strlen"
-    echo "l - starts log"
-    echo "e - promts you to enter exit code and finish program"
-    echo "Enter your command: "
+    interactive_mode_menu
     read uscom
     echo
     if [[ $uscom == "c" || $uscom == "s" || $uscom == "r" || $uscom == "l" || $uscom == "e" || $uscom == "len" || $uscom == "h" ]]; then
@@ -208,21 +217,21 @@ elif [[ "$whichp" == "-interactive" ]]; then
         elif [[ $uscom == "s" ]]; then
             checksource $searchsource
             if [[ $? -eq 0 ]]; then
-            echo "You entered search mode, please enter foldename and pattern"
-            read searchthing
-            IFS=' '
-            read -ra ADDR <<< "$searchthing"
-            runsearch ${ADDR[0]} ${ADDR[1]}
-            echo
-            echo $returnmes
-            IFS=$defIFS
-            else 
-                echo $modulenotloadedinter
+                echo "You entered search mode, please enter foldername (!folderpath must be full. EX: /home/ubutnu/...) and pattern:"
+                read searchthing
+                IFS=' '
+                read -ra ADDR <<< "$searchthing"
+                runsearch ${ADDR[0]} ${ADDR[1]}
+                echo
+                echo $returnmes
+                IFS=$defIFS
+                else 
+                    echo $modulenotloadedinter
             fi
         elif [[ $uscom == "r" ]]; then
             checksource $reversesource
             if [[ $? -eq 0 ]]; then
-            echo "You entered reverse mode. Please enter input file and output file. Example input.txt output.txt"
+            echo "You entered reverse mode. Please enter input file and output file. (!Filepath must be full. EX: /home/ubuntu/.../input.txt)"
             read reversething
             IFS=' '
             read -ra ADDR <<< "$reversething"
@@ -232,6 +241,7 @@ elif [[ "$whichp" == "-interactive" ]]; then
             IFS=$defIFS
             else
                 echo $modulenotloadedinter
+
             fi
         elif [[ $uscom == "l" ]]; then
             checksource $logsource
@@ -242,6 +252,7 @@ elif [[ "$whichp" == "-interactive" ]]; then
             echo $returnmes
             else
                 echo $modulenotloadedinter
+
             fi
         elif [[ $uscom == "e" ]]; then
             echo "You are exiting the program. Enter exit code or do not print anything and exit code will be default(0):"
@@ -267,6 +278,8 @@ elif [[ "$whichp" == "-interactive" ]]; then
     done
 elif [[ -z "$whichp" ]]; then
     echo "You have not provided any arguments, please refer to -help command"
+    exitt 35
 else    
     echo "There is no such a command, to see available commands please refer to -help command"
+    exitt 10
 fi

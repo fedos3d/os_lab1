@@ -1,23 +1,23 @@
 # !/bin/bash
 
-#Tasks to do:
-#Does not work in interactive mode, gotta fix...
-# my command: tac -r -s 'x\|[^x]'
-
 inputfile=$1
 outputfile=$2
 
 filereg="^(.+)\/([^\/]+)$"
+
 if [[ -z "$inputfile" ]]; then
     echo "You have not entered input file, please refer to -help command"
+    return 35
 elif [[ -z "$outputfile" ]]; then
-    echo "You have not entered output file, please refer to -help command"    
+    echo "You have not entered output file, please refer to -help command"   
+    return 35
 elif [[ $inputfile =~ $filereg && $outputfile =~ $filereg ]]; then
-    tac -r -s 'x\|[^x]' $inputfile > $outputfile
-    [[ $? -eq 1 ]] && echo "There is no such file, pleade refer to help"
-    exit 0
+    tac -r -s 'x\|[^x]' 2>&- $inputfile > $outputfile 2>&-
+    [[ $? -eq 0 ]] && return 0
+    [[ $? -eq 1 ]] && echo "Check your paramets (input and output file), please refer to -help command"; return 150
+    #[[ $? -eq 2 ]] && echo "No such folder"
 else
-    echo "You have enterd wrong filename, please refer to help"
-    exit 0
+    echo "You have enterd wrong filepath, please refer to -help command"
+    return 150
 fi
 
