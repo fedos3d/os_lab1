@@ -2,6 +2,9 @@
 
 #Do i need here functions? or i can rewrite calc.sh without functions, because they are litterly just one string.
 
+#Tasks to do:
+#Polish file and params check
+
 whichcalc=$1
 num_1=$2
 num_2=$3
@@ -9,7 +12,7 @@ num_2=$3
 inputnumbererror="Input error, one or both parameters you have provided are not numbers, please refer to -help command"
 nosuchcalccommand="There is no such a calc command, please refer to the -help command"
 
-re="^[+-]?[0-9]+$"
+re="^[+-]?[0-9]+$" #regex for numbers
 
 command_success()
 {
@@ -33,7 +36,7 @@ div() {
     if [[ $num_2 = 0 || $num_2 == "-0" || $num_2 == "+0" ]]; then #Here we check if second param is not zero
         echo "Input error, You can't divide by zero"
     else
-        echo "$num_1 / $num_2" | bc -l | perl -pe '/\./ && s/0+$/$1/ && s/\.$//' 2>&- #Is it okay that i used perl there? Dodelay 
+        echo "$num_1 / $num_2" | bc -l | perl -pe '/\./ && s/0+$/$1/ && s/\.$//' 2>&-
     fi    
     
 }

@@ -1,20 +1,35 @@
 # !/bin/bash
 
-re='^[+-]?[0-9]+$'
-re2="^(.+)\/([^/]+)$"
-returnmes="Returning to command list..."
-#inputerror="Input error, check your parameters"
-exitcode=0
+#Tasks to do:
+#Check source onlt once, in the begging of programm and store result in array.
+#log command prints only line containing warning and info alias, is it okay?
+#interactive search,reverse does not work...
+#exit codes need polishing
+#help command needs polishing
+#overall polising: rewrite if statement in shirt form, bash butifier
 
+whichp=$1 #Var responsible for command
+
+defIFS=$IFS #Remember default IFS
+
+re='^[+-]?[0-9]+$' #regexp for numbers
+
+#source files (in case they are moved)
 calcsource="calc.sh"
 searchsource="search.sh"
 reversesource="reverse.sh"
 logsource="log.sh"
 
-modulenotloaded="Module responsible for this command is not loaded, you can not use this command. $returnmes"
+#return codes
+nomodulecode=100
 
+#messages for user
+returnmes="Returning to command list..."
+modulenotloaded="Module responsible for this command is not loaded, you can not use this command. "
+modulenotloadedinter="$modulenotloaded$returnmes"
 
-help() #Need to work on
+#function runs help command
+help()
 {
     echo "Script Author - Anikeev Fedor M3209";
     echo
@@ -28,12 +43,12 @@ help() #Need to work on
     echo "              usage: -search folderpath pattern"
     echo
     echo "          -reverse : "
-    echo "              usage: -reverse -filetoreverse -filewheretostore"
+    echo "              usage: -reverse filetoreverse filewheretostore"
     echo
     echo "          -strlen : calulates length of the string"
-    echo "              usage: -stlen -yourstring"
+    echo "              usage: -stlen yourstring"
     echo
-    echo "          -log: does something..."
+    echo "          -log: prints log from a specified file (\"/var/log/anaconda/X.log\")"
     echo
     echo "          -exit: exits programm with your exit code (You can use numbers from 0-244 (default is 0))"
     echo "              usage: -exit yournumber"
@@ -43,60 +58,56 @@ help() #Need to work on
     echo "          -interactive: enables interactive mode"
     echo
     echo "          exit codes description:"
-    echo "              100 - one of modules was not loaded"
+    echo "              100 - module was not loaded"
+    echo "              150 - file was not found"
+    echo "              0 - succes"
+    echo "              10 - no such command"
 }
 
-whichp=$1
-calcsourced=1
-searchsourced=1
-reversesourced=1
-logsourced=1
-
+#function that checks if file ca be loaded
 checksource()
 {
     file=$1
     [[ -f "$file" ]] && return 0 || return 1 
 }
 
+#function that runs calc command
 runcalc() 
 {
-        calcsourced=0
         whichcalc=$1
         num_1=$2
         num_2=$3   
-        source calc.sh $whichcalc $num_1 $num_2
-        #source calc.sh $whichcalc $num_1 $num_2 2>&- #Here we supress output log...is it bad????
-        #[[ $? -eq 0 ]] && calcsourced=0 || echo "Source calc.sh is not loaded, ypu can not use -calc command"; 
+        source $calcsource $whichcalc $num_1 $num_2
 }
 
+#function that runs search command
 runsearch()
 {
     foldername=$1
     pattern=$2
-    source search.sh $foldername $pattern
-    #[[ $? -eq 0 ]] && searchsourced=0 || echo "Source search.sh is not loaded, you can not use -search command"; 
+    source $searchsource $foldername $pattern
 
 }
 
+#functions that runs reverse command
 runreverse()
 {
     file1=$1
     file2=$2
-    source reverse.sh $file1 $file2 2>&-
-    #[[ $? -eq 0 ]] && reversesourced=0 || echo "Source reverse.sh is not loaded, you can not use -reverse command";
+    source $reversesource $file1 $file2
 }
 
+#function that runs log command
 runlog()
 {
-    #echo "Log command is not yet available"
-    source log.sh
-    #[[ $? -eq 0 ]] && logsourced=0 || echo "Source log.sh is not loaded, you can not use -log command"; exit 100
+    source $logsource
 }
 
+#functions that runs exit command
 exitt()
 {
     if [[ $1 =~ $re ]]; then
-        if [[ "$1" -ge "0" && "$1" -le "244" ]]; then
+        if [[ "$1" -ge "0" && "$1" -le "244" ]]; then #here we check that number is in range 0-244
             exit $1
         else
             exit 0
@@ -106,36 +117,63 @@ exitt()
     fi
 }
 
+#function that runs strlen command
 runstrlen()
 {
-    echo ${#1}
+    echo ${#1} #How does it work?
 }
 
-if [[ "$whichp" == "-calc" ]]; then # gotta optimize param check for calc   
-    runcalc $2 $3 $4
+if [[ "$whichp" == "-calc" ]]; then   
+    checksource $calcsource
+    if [[ $? -eq 0 ]]; then
+        runcalc $2 $3 $4
+        exitt $?
+    else
+        echo "$modulenotloaded"
+        exitt $nomodulecode
+    fi
+    
 
-elif [[ "$whichp" == "-search" ]]; then # hard, need to think
-    checksource reversesource
-    runsearch $2 $3
-
-elif [[ "$whichp" == "-reverse" ]]; then # hard, need to think
-    runreverse $2 $3
-
-elif [[ "$whichp" == "-strlen" ]]; then # Simple enough...
+elif [[ "$whichp" == "-search" ]]; then
+    checksource $searchsource
+    if [[ $? -eq 0 ]]; then
+        runsearch $2 $3
+        exitt $?
+    else
+        echo "$modulenotloaded"
+        exitt $nomodulecode
+    fi
+elif [[ "$whichp" == "-reverse" ]]; then 
+    checksource $reversesource
+    if [[ $? -eq 0 ]]; then
+        runreverse $2 $3
+        exitt $?
+    else
+        echo "$modulenotloaded"
+        exitt $nomodulecode
+    fi
+elif [[ "$whichp" == "-strlen" ]]; then 
     runstrlen $2    
 
-elif [[ "$1" == "-log" ]]; then # lutuiy kek
-    runlog
-
-elif [[ "$whichp" == "exit" ]]; then
+elif [[ "$1" == "-log" ]]; then 
+    checksource $logsource
+    if [[ $? -eq 0 ]]; then
+        runlog
+        exitt $?
+    else
+        echo "$modulenotloaded"
+        exitt $nomodulecode
+    fi
+elif [[ "$whichp" == "-exit" ]]; then
     exitt $2
 
 elif [[ "$whichp" == "-help" ]]; then
     help
+    exitt $?
 
 elif [[ "$whichp" == "-interactive" ]]; then
     ever=0
-    while [ 0 ]  
+    while [ $ever -eq 0 ]  
     do
     echo
     echo "You are now in interactive mode!"
@@ -148,14 +186,14 @@ elif [[ "$whichp" == "-interactive" ]]; then
     echo "len - starts strlen"
     echo "l - starts log"
     echo "e - promts you to enter exit code and finish program"
-    echo 
     echo "Enter your command: "
     read uscom
+    echo
     if [[ $uscom == "c" || $uscom == "s" || $uscom == "r" || $uscom == "l" || $uscom == "e" || $uscom == "len" || $uscom == "h" ]]; then
         if [[ $uscom == "c" ]]; then
             checksource $calcsource 
             if [[ $? -eq 0 ]]; then
-                echo "Please chose an operation and provide 2 numbers to calculate. Example: sum 1 2"
+                echo "Please chose an operation and provide 2 numbers to calculate. Example: -sum 1 2"
                 echo
                 read calcthing
                 IFS=' '
@@ -163,9 +201,9 @@ elif [[ "$whichp" == "-interactive" ]]; then
                 runcalc ${ADDR[0]} ${ADDR[1]} ${ADDR[2]}
                 echo 
                 echo $returnmes
-                echo
+                IFS=$defIFS
             else
-                echo $modulenotloaded
+                echo $modulenotloadedinter
             fi
         elif [[ $uscom == "s" ]]; then
             checksource $searchsource
@@ -177,9 +215,9 @@ elif [[ "$whichp" == "-interactive" ]]; then
             runsearch ${ADDR[0]} ${ADDR[1]}
             echo
             echo $returnmes
-            echo
+            IFS=$defIFS
             else 
-                echo $modulenotloaded
+                echo $modulenotloadedinter
             fi
         elif [[ $uscom == "r" ]]; then
             checksource $reversesource
@@ -191,23 +229,22 @@ elif [[ "$whichp" == "-interactive" ]]; then
             runreverse ${ADDR[0]} ${ADDR[1]}
             echo
             echo $returnmes
-            echo
+            IFS=$defIFS
             else
-                echo $modulenotloaded 
+                echo $modulenotloadedinter
             fi
         elif [[ $uscom == "l" ]]; then
             checksource $logsource
             if [[ $? -eq 0 ]]; then
-            echo "You entered log mode. Log is to be printed"
+            echo "You entered log mode. Printing log..."
             runlog
             echo
             echo $returnmes
-            echo
             else
-                echo $modulenotloaded
+                echo $modulenotloadedinter
             fi
         elif [[ $uscom == "e" ]]; then
-            echo "You are exiting the program. Enter exit code or do not print anything and exit code will be default(0)"
+            echo "You are exiting the program. Enter exit code or do not print anything and exit code will be default(0):"
             read code
             echo
             exitt $code
@@ -216,18 +253,16 @@ elif [[ "$whichp" == "-interactive" ]]; then
             read lenstr
             runstrlen $lenstr
             echo 
-            echo $returnmes
-            echo          
+            echo $returnmes       
         elif [[ $uscom == "h" ]]; then
             echo "You entered help."
             help
             echo
             echo $returnmes
-            echo  
         fi
     else
         echo
-        echo "You entered nonvalid command, please refer to command list for more"
+        echo "You entered nonvalid command, please refer -help command"
     fi
     done
 elif [[ -z "$whichp" ]]; then

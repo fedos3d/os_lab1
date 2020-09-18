@@ -1,5 +1,7 @@
 # !/bin/bash
 
+#Tasks to do:
+#Not working in interactive mode...
 
 foldername=$1
 pattern=$2
