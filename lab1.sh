@@ -74,7 +74,7 @@ runsearch()
     foldername=$1
     pattern=$2
     source search.sh $foldername $pattern
-    [[ $? -eq 0 ]] && searchsourced=0 || echo "Source search.sh is not loaded, you can not use -search command"; 
+    #[[ $? -eq 0 ]] && searchsourced=0 || echo "Source search.sh is not loaded, you can not use -search command"; 
 
 }
 
@@ -83,7 +83,7 @@ runreverse()
     file1=$1
     file2=$2
     source reverse.sh $file1 $file2 2>&-
-    [[ $? -eq 0 ]] && reversesourced=0 || echo "Source reverse.sh is not loaded, you can not use -reverse command";
+    #[[ $? -eq 0 ]] && reversesourced=0 || echo "Source reverse.sh is not loaded, you can not use -reverse command";
 }
 
 runlog()
@@ -111,10 +111,11 @@ runstrlen()
     echo ${#1}
 }
 
-if [[ "$whichp" = ="-calc" ]]; then # gotta optimize param check for calc   
+if [[ "$whichp" == "-calc" ]]; then # gotta optimize param check for calc   
     runcalc $2 $3 $4
 
 elif [[ "$whichp" == "-search" ]]; then # hard, need to think
+    checksource reversesource
     runsearch $2 $3
 
 elif [[ "$whichp" == "-reverse" ]]; then # hard, need to think
@@ -229,6 +230,8 @@ elif [[ "$whichp" == "-interactive" ]]; then
         echo "You entered nonvalid command, please refer to command list for more"
     fi
     done
+elif [[ -z "$whichp" ]]; then
+    echo "You have not provided any arguments, please refer to -help command"
 else    
-    echo "There is no such a command, to see available commands please refer to help"
+    echo "There is no such a command, to see available commands please refer to -help command"
 fi
