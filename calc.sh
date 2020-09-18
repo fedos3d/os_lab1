@@ -11,20 +11,19 @@ re="^[+-]?[0-9]+$" #regex for numbers
 
 sum() {     
     echo "$num_1 + $num_2" | bc 2>&-
-
     return 0
 }
 
 sub() {
     echo "$num_1 - $num_2" | bc 2>&-
-
     return 0
 }
+
 mul() {
     echo "$num_1 * $num_2" | bc 2>&-
-
     return 0
 }
+
 div() {
     if [[ $num_2 = 0 || $num_2 == "-0" || $num_2 == "+0" ]]; then #Here we check if second param is not zero
         echo "Input error, You can't divide by zero"
@@ -33,8 +32,8 @@ div() {
         echo "$num_1 / $num_2" | bc -l | perl -pe '/\./ && s/0+$/$1/ && s/\.$//' 2>&-
         return 0
     fi    
-    
 }
+
 if [[ "$whichcalc" == "-sum" || "$whichcalc" == "-sub" || "$whichcalc" == "-mul" || "$whichcalc" == "-div" ]]; then
     if [[ -z "$num_1" || -z "$num_2" ]]; then
             echo "You have not provided one or both numbers required for calculation, please refer to -help command"
@@ -54,7 +53,6 @@ if [[ "$whichcalc" == "-sum" || "$whichcalc" == "-sub" || "$whichcalc" == "-mul"
                     div
                     ;; 
             esac
-    
     else
         echo $inputnumbererror
         return 18

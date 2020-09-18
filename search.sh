@@ -17,17 +17,17 @@ else
         grep -r "$pattern" "$foldername" 2>&-
         case $? in
             0)
-            return 0
-            ;;
+                return 0
+                ;;
             1)
-            echo "There are no strings matching your pattern"; return 25
-            ;;
+                echo "There are no strings matching your pattern"; return 25
+                ;;
             2)
-            echo "No such folder"; return 150
-            ;;
+                echo "No such folder"; return 150
+                ;;
         esac
     else
-        echo $searcherror #can I use grep here?
+        echo $searcherror
         return 150
     fi
 fi

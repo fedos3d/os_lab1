@@ -1,6 +1,5 @@
 # !/bin/bash
 
-#Tasks to do:
 #log command prints only line containing warning and info alias, is it okay?
 #overall polising: rewrite if statement in shirt form, bash butifier
 
@@ -72,33 +71,25 @@ help()
 #function that checks if file ca be loaded
 checksource()
 {
-    file=$1
-    [[ -f "$file" ]] && return 0 || return 1 
+    [[ -f "$1" ]] && return 0 || return 1 
 }
 
 #function that runs calc command
 runcalc() 
 {
-        whichcalc=$1
-        num_1=$2
-        num_2=$3   
-        source $calcsource $whichcalc $num_1 $num_2
+    source $calcsource $1 $2 $3
 }
 
 #function that runs search command
 runsearch()
 {
-    foldername=$1
-    pattern=$2
-    source $searchsource $foldername $pattern
+    source $searchsource $1 $2
 }
 
 #functions that runs reverse command
 runreverse()
 {
-    file1=$1
-    file2=$2
-    source $reversesource $file1 $file2
+    source $reversesource $1 $2
 }
 
 #function that runs log command
@@ -110,15 +101,7 @@ runlog()
 #functions that runs exit command
 exitt()
 {
-    if [[ $1 =~ $re ]]; then
-        if [[ "$1" -ge "0" && "$1" -le "244" ]]; then #here we check that number is in range 0-244
-            exit $1
-        else
-            exit 0
-        fi
-    else
-        exit 0 
-    fi
+    [[ $1 =~ $re ]] && [[ "$1" -ge "0" && "$1" -le "244" ]] && exit $1 || exit 0 || exit 0 #here we check that number is in range 0-244
 }
 
 #function that runs strlen command
@@ -145,45 +128,23 @@ interactive_mode_menu()
 
 if [[ "$whichp" == "-calc" ]]; then   
     checksource $calcsource
-    if [[ $? -eq 0 ]]; then
-        runcalc $2 $3 $4
-        exitt $?
-    else
-        echo "$modulenotloaded"
-        exitt $nomodulecode
-    fi
-    
+    [[ $? -eq 0 ]] && runcalc $2 $3 $4; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
 
 elif [[ "$whichp" == "-search" ]]; then
     checksource $searchsource
-    if [[ $? -eq 0 ]]; then
-        runsearch $2 $3
-        exitt $?
-    else
-        echo "$modulenotloaded"
-        exitt $nomodulecode
-    fi
+    [[ $? -eq 0 ]] && runsearch $2 $3; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
+
 elif [[ "$whichp" == "-reverse" ]]; then 
     checksource $reversesource
-    if [[ $? -eq 0 ]]; then
-        runreverse $2 $3
-        exitt $?
-    else
-        echo "$modulenotloaded"
-        exitt $nomodulecode
-    fi
+    [[ $? -eq 0 ]] && runreverse $2 $3; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
+
 elif [[ "$whichp" == "-strlen" ]]; then 
     runstrlen $2    
 
 elif [[ "$1" == "-log" ]]; then 
     checksource $logsource
-    if [[ $? -eq 0 ]]; then
-        runlog
-        exitt $?
-    else
-        echo "$modulenotloaded"
-        exitt $nomodulecode
-    fi
+    [[ $? -eq 0 ]] && runlog; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
+
 elif [[ "$whichp" == "-exit" ]]; then
     exitt $2
 
@@ -225,34 +186,32 @@ elif [[ "$whichp" == "-interactive" ]]; then
                 echo
                 echo $returnmes
                 IFS=$defIFS
-                else 
-                    echo $modulenotloadedinter
+            else 
+                echo $modulenotloadedinter
             fi
         elif [[ $uscom == "r" ]]; then
             checksource $reversesource
             if [[ $? -eq 0 ]]; then
-            echo "You entered reverse mode. Please enter input file and output file. (!Filepath must be full. EX: /home/ubuntu/.../input.txt)"
-            read reversething
-            IFS=' '
-            read -ra ADDR <<< "$reversething"
-            runreverse ${ADDR[0]} ${ADDR[1]}
-            echo
-            echo $returnmes
-            IFS=$defIFS
+                echo "You entered reverse mode. Please enter input file and output file. (!Filepath must be full. EX: /home/ubuntu/.../input.txt)"
+                read reversething
+                IFS=' '
+                read -ra ADDR <<< "$reversething"
+                runreverse ${ADDR[0]} ${ADDR[1]}
+                echo
+                echo $returnmes
+                IFS=$defIFS
             else
                 echo $modulenotloadedinter
-
             fi
         elif [[ $uscom == "l" ]]; then
             checksource $logsource
             if [[ $? -eq 0 ]]; then
-            echo "You entered log mode. Printing log..."
-            runlog
-            echo
-            echo $returnmes
+                echo "You entered log mode. Printing log..."
+                runlog
+                echo
+                echo $returnmes
             else
                 echo $modulenotloadedinter
-
             fi
         elif [[ $uscom == "e" ]]; then
             echo "You are exiting the program. Enter exit code or do not print anything and exit code will be default(0):"
