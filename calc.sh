@@ -4,10 +4,10 @@ whichcalc=$1
 num_1=$2
 num_2=$3
 
-inputnumbererror="Input error, one or both parameters you have provided are not numbers, please refer to -help command"
+inputnumbererror="Input error, one or both parameters you have provided are not numbers or numbers with plus sign, please refer to -help command"
 nosuchcalccommand="There is no such a calc command, please refer to the -help command"
 
-re="^[+-]?[0-9]+$" #regex for numbers
+re="^[-]?[0-9]+$" #regex for numbers
 
 sum() {     
     echo "$num_1 + $num_2" | bc 2>&-

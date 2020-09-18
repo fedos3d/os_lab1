@@ -1,8 +1,5 @@
 # !/bin/bash
 
-#log command prints only line containing warning and info alias, is it okay?
-#overall polising: rewrite if statement in shirt form, bash butifier
-
 whichp=$1 #Var responsible for command
 
 defIFS=$IFS #Remember default IFS
@@ -115,7 +112,7 @@ interactive_mode_menu()
     echo
     echo "You are now in interactive mode!"
     echo
-    echo "Please enter a letter to run a command: "
+    echo "Please enter a letter(!Without params!) to run a command: "
     echo "c - starts calulator"
     echo "s - starts search"
     echo "h - starts help"
