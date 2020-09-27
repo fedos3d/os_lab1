@@ -3,7 +3,7 @@
 inputfile=$1
 outputfile=$2
 
-filereg="^(.+)\/([^\/]+)$"
+filereg="(?:[^/]*/)*)(.*)$"
 
 if [[ -z "$inputfile" ]]; then
     echo "You have not entered input file, please refer to -help command"

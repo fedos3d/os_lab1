@@ -38,7 +38,7 @@ help()
     echo "              usage: -reverse inputfile outputfile"
     echo
     echo "          -strlen : calulates length of the string"
-    echo "              usage: -stlen yourstring"
+    echo "              usage: -strlen \"yourstring\""
     echo
     echo "          -log: prints log from a specified file (\"/var/log/anaconda/X.log\")"
     echo
@@ -136,13 +136,23 @@ elif [[ "$whichp" == "-reverse" ]]; then
     [[ $? -eq 0 ]] && runreverse $2 $3; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
 
 elif [[ "$whichp" == "-strlen" ]]; then 
-    runstrlen $2    
+    if [[ -z ${2+x} ]]; then
+        echo "You have not provided any string to calculate"
+        exitt 35
+    else
+        echo ${#2}  
+    fi  
 
 elif [[ "$1" == "-log" ]]; then 
     checksource $logsource
     [[ $? -eq 0 ]] && runlog; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
 
 elif [[ "$whichp" == "-exit" ]]; then
+    if [[ -z ${2+x} ]]; then
+        echo "You have not provided any exit code, the default wiil be 0"
+    elif [[ ! $2 =~ $re ]]; then
+        echo "Exit code you entered is not a valid number(default wiil be 0), please refer to -help command"
+    fi
     exitt $2
 
 elif [[ "$whichp" == "-help" ]]; then
@@ -175,7 +185,7 @@ elif [[ "$whichp" == "-interactive" ]]; then
         elif [[ $uscom == "s" ]]; then
             checksource $searchsource
             if [[ $? -eq 0 ]]; then
-                echo "You entered search mode, please enter foldername (!folderpath must be full. EX: /home/ubutnu/...) and pattern:"
+                echo "You entered search mode, please enter foldername and pattern:"
                 read searchthing
                 IFS=' '
                 read -ra ADDR <<< "$searchthing"
@@ -189,7 +199,7 @@ elif [[ "$whichp" == "-interactive" ]]; then
         elif [[ $uscom == "r" ]]; then
             checksource $reversesource
             if [[ $? -eq 0 ]]; then
-                echo "You entered reverse mode. Please enter input file and output file. (!Filepath must be full. EX: /home/ubuntu/.../input.txt)"
+                echo "You entered reverse mode. Please enter input file and output file:"
                 read reversething
                 IFS=' '
                 read -ra ADDR <<< "$reversething"
@@ -216,11 +226,13 @@ elif [[ "$whichp" == "-interactive" ]]; then
             echo
             exitt $code
         elif [[ $uscom == "len" ]]; then
-            echo "You entered strlen mode. Please enter a string to get its length"
+            echo "You entered strlen mode. Please enter a string to get its length (Use quotes like this: \"yoursting\"):"
             read lenstr
-            runstrlen $lenstr
+            temp=${#lenstr}
+            temp=$(($temp-2))
+            echo $temp
             echo 
-            echo $returnmes       
+            echo $returnmes     
         elif [[ $uscom == "h" ]]; then
             echo "You entered help."
             help

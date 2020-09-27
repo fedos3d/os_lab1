@@ -1,19 +1,21 @@
 # !/bin/bash
 
+#Search needs work
+
 foldername=$1
 pattern=$2
 searcherror="You have entered wrong folder path, please check folder path format using -help command"
 
-path="^(.+)\/([^\/]+)$"
+path1="((?:[^/]*/)*)(.*)$"
 
-if [[ -z "$foldername" ]]; then
-    echo "You have entered empty foldername"
+if [[ -z ${1+x} ]]; then
+    echo "You have entered no foldername, please refer to -help command"
     return 35
-elif [[ -z "$pattern" ]]; then
-    echo "You have entered empty pattern"
+elif [[ -z ${2+x} ]]; then
+    echo "You have entered no pattern, please refer to -help command"
     return 35
 else
-    if [[ $foldername =~ $path ]]; then
+    if [[ $foldername =~ $path1 || $foldername =~ $path2 ]]; then
         grep -r "$pattern" "$foldername" 2>&-
         case $? in
             0)

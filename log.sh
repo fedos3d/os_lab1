@@ -3,7 +3,7 @@
 #Need to add code which can show more then oneline string?????
 #excludereg="((\+\+)|(\!\!)|(\-\-)|(\*\*)|(\=\=)|(EE)|(NI)|(\?\?))$"
 
-logfile="/var/log/anaconda/X.log"
+logfile="X.log" #FIXIFIFIFIFIFIFIFIFIFIFIX IT BEFORE COMMIT
 warningreg="(WW)"
 informationreg="(II)"
 excetion1="(EE)"
@@ -11,6 +11,7 @@ exception2="(!!)"
 
 yellow='\033[1;33m' #Yellow color
 blue='\033[1;34m' #Blue color
+NC='\033[0m' #No color
 
 mem=$IFS #Store default IFS value
 
@@ -18,16 +19,16 @@ IFS=$'\n'
 
 if [[ -f "$logfile" ]]; then 
     for line in $(cat $logfile); do
-        [[ $line =~ $warningreg && ! $line =~ $excetion1 ]] && echo -e "{$line//(WW)/${yellow}Warning}"
+        [[ $line =~ $warningreg && ! $line =~ $excetion1 ]] && echo -e "${line//(WW)/${yellow}Warning:${NC}}"
     done
 
     IFS=$'\n'  
 
     for line in $(cat $logfile); do
-        [[ $line =~ $informationreg && ! $line =~ $exception2 ]] && echo -e "{$line//(II)/${blue}Infromation}"
+        [[ $line =~ $informationreg && ! $line =~ $exception2 ]] && echo -e "${line//(II)/${blue}Infromation:${NC}}"
     done
 
-    NC='\033[0m' #No color
+    
     echo -e "$NC"
     IFS=$mem
     
