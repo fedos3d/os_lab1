@@ -18,13 +18,13 @@ IFS=$'\n'
 
 if [[ -f "$logfile" ]]; then 
     for line in $(cat $logfile); do
-        [[ $line =~ $warningreg && ! $line =~ $excetion1 ]] && echo -e "${yellow}$line"
+        [[ $line =~ $warningreg && ! $line =~ $excetion1 ]] && echo -e "{$line//(WW)/${yellow}Warning}"
     done
 
     IFS=$'\n'  
 
     for line in $(cat $logfile); do
-        [[ $line =~ $informationreg && ! $line =~ $exception2 ]] && echo -e "${blue}$line"
+        [[ $line =~ $informationreg && ! $line =~ $exception2 ]] && echo -e "{$line//(II)/${blue}Infromation}"
     done
 
     NC='\033[0m' #No color
