@@ -98,7 +98,15 @@ runlog()
 #functions that runs exit command
 exitt()
 {
-    [[ $1 =~ $re ]] && [[ "$1" -ge "0" && "$1" -le "244" ]] && exit $1 || exit 0 || exit 0 #here we check that number is in range 0-244
+    if [[ $1 =~ $re ]]; then 
+        if [[ "$1" -ge "0" && "$1" -le "244" ]]; then
+            exit $1
+        else 
+            exit 0 
+        fi
+    else 
+        exit 0 #here we check that number is in range 0-244
+    fi
 }
 
 #function that runs strlen command
@@ -160,12 +168,13 @@ elif [[ "$1" == "log" ]]; then
         echo "$modulenotloaded"; exitt $nomodulecode
     fi
 elif [[ "$whichp" == "exit" ]]; then
+    num=$2
     if [[ -z ${2+x} ]]; then
         echo "You have not provided any exit code, the default wiil be 0"
     elif [[ ! $2 =~ $re ]]; then
         echo "Exit code you entered is not a valid number(default wiil be 0), please refer to help command"
-    elif [[ "$1" -ge "0" && "$1" -le "244" ]]; then
-        echo "Your exit code is not between range of [0-244], exit code will be default(0)"
+    elif (( $num < 0 )) || (( $num > 244)); then
+        echo "Your number is not in range of [0-244], exit code will be default(0)"
     fi
     exitt $2
 
@@ -237,6 +246,14 @@ elif [[ "$whichp" == "interactive" ]]; then
         elif [[ $uscom == "e" ]]; then
             echo "You are exiting the program. Enter exit code or do not print anything and exit code will be default(0):"
             read code
+            num=$code
+            if [[ -z ${code+x} ]]; then
+            echo "You have not provided any exit code, the default wiil be 0"
+            elif [[ ! $num =~ $re ]]; then
+            echo "Exit code you entered is not a valid number(default wiil be 0), please refer to help command"
+            elif (( $num < 0 )) || (( $num > 244)); then
+            echo "Your number is not in range of [0-244], exit code will be default(0)"
+            fi
             echo
             exitt $code
         elif [[ $uscom == "len" ]]; then
