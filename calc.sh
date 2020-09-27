@@ -4,8 +4,8 @@ whichcalc=$1
 num_1=$2
 num_2=$3
 
-inputnumbererror="Input error, one or both parameters you have provided are not numbers or numbers with plus sign, please refer to -help command"
-nosuchcalccommand="There is no such a calc command, please refer to the -help command"
+inputnumbererror="Input error, one or both parameters you have provided are not integer numbers or numbers with plus sign, please refer to help command"
+nosuchcalccommand="There is no such a calc command, please refer to the help command"
 
 re="^[-]?[0-9]+$" #regex for numbers
 
@@ -34,22 +34,22 @@ div() {
     fi    
 }
 
-if [[ "$whichcalc" == "-sum" || "$whichcalc" == "-sub" || "$whichcalc" == "-mul" || "$whichcalc" == "-div" ]]; then
+if [[ "$whichcalc" == "sum" || "$whichcalc" == "sub" || "$whichcalc" == "mul" || "$whichcalc" == "div" ]]; then
     if [[ -z "$num_1" || -z "$num_2" ]]; then
-            echo "You have not provided one or both numbers required for calculation, please refer to -help command"
+            echo "You have not provided one or both numbers required for calculation, please refer to help command"
             return 35
     elif [[ $num_1 =~ $re  &&  $num_2 =~ $re ]]; then #Here we check if params are numbers
             case $whichcalc in
-                -sum)
+                sum)
                     sum
                     ;;
-                -sub)
+                sub)
                     sub
                     ;;
-                -mul)
+                mul)
                     mul
                     ;;
-                -div)
+                div)
                     div
                     ;; 
             esac
@@ -58,7 +58,7 @@ if [[ "$whichcalc" == "-sum" || "$whichcalc" == "-sub" || "$whichcalc" == "-mul"
         return 18
     fi       
 elif [[ -z "$whichcalc" ]]; then
-    echo "You have not provided any calc command, please refer to -help command"
+    echo "You have not provided any calc command, please refer to help command"
     return 35
 else
     echo $nosuchcalccommand

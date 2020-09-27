@@ -1,9 +1,9 @@
 # !/bin/bash
 
 #Need to add code which can show more then oneline string?????
-#excludereg="((\+\+)|(\!\!)|(\-\-)|(\*\*)|(\=\=)|(EE)|(NI)|(\?\?))$"
 
-logfile="X.log" #FIXIFIFIFIFIFIFIFIFIFIFIX IT BEFORE COMMIT
+
+logfile="var/log/anaconda/X.log"
 warningreg="(WW)"
 informationreg="(II)"
 excetion1="(EE)"

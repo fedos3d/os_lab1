@@ -27,27 +27,27 @@ help()
     echo
     echo "  You can use the following commands:"
     echo
-    echo "          -calc : allows you to calculate 2 numbers"
-    echo "              usage: -sum/-sub/-mul/-div int1 int2"
+    echo "          calc : allows you to calculate 2 numbers"
+    echo "              usage: sum/sub/mul/div int1 int2"
     echo "                  3 and 4th params are numbers (!integers! Do not use plus sign with numbers (-4 - ok, 6 - ok, +7 - not ok))"
     echo
-    echo "          -search : command does a recurrent search for a string with your pattern"
-    echo "              usage: -search folderpath pattern"
+    echo "          search : command does a recurrent search for a string with your pattern"
+    echo "              usage: search folderpath \"pattern\""
     echo
-    echo "          -reverse : reverse order of every character in file and prints it to other file"
-    echo "              usage: -reverse inputfile outputfile"
+    echo "          reverse : reverse order of every character in file and prints it to other file"
+    echo "              usage: reverse inputfile outputfile"
     echo
-    echo "          -strlen : calulates length of the string"
-    echo "              usage: -strlen \"yourstring\""
+    echo "          strlen : calulates length of the string"
+    echo "              usage: strlen \"yourstring\""
     echo
-    echo "          -log: prints log from a specified file (\"/var/log/anaconda/X.log\")"
+    echo "          log: prints log from a specified file (\"/var/log/anaconda/X.log\")"
     echo
-    echo "          -exit: exits programm with your exit code (You can use numbers from 0-244 (default is 0))"
-    echo "              usage: -exit yournumber"
+    echo "          exit: exits programm with your exit code (You can use numbers from 0-244 (default is 0))"
+    echo "              usage: exit yournumber"
     echo
-    echo "          -help: prints help"
+    echo "          help: prints help"
     echo
-    echo "          -interactive: enables interactive mode"
+    echo "          interactive: enables interactive mode"
     echo
     echo "          exit codes description:"
     echo "              general:"
@@ -80,7 +80,7 @@ runcalc()
 #function that runs search command
 runsearch()
 {
-    source $searchsource $1 $2
+    source $searchsource $1 "$2"
 }
 
 #functions that runs reverse command
@@ -123,19 +123,28 @@ interactive_mode_menu()
     echo "Enter your command: "
 }
 
-if [[ "$whichp" == "-calc" ]]; then   
+if [[ "$whichp" == "calc" ]]; then   
     checksource $calcsource
-    [[ $? -eq 0 ]] && runcalc $2 $3 $4; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
-
-elif [[ "$whichp" == "-search" ]]; then
+    if [[ $? -eq 0 ]]; then
+        runcalc $2 $3 $4; exitt $?
+    else 
+        echo "$modulenotloaded"; exitt $nomodulecode
+    fi
+elif [[ "$whichp" == "search" ]]; then
     checksource $searchsource
-    [[ $? -eq 0 ]] && runsearch $2 $3; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
-
-elif [[ "$whichp" == "-reverse" ]]; then 
+    if [[ $? -eq 0 ]]; then
+        runsearch $2 "$3"; exitt $? 
+    else 
+        echo "$modulenotloaded"; exitt $nomodulecode
+    fi
+elif [[ "$whichp" == "reverse" ]]; then 
     checksource $reversesource
-    [[ $? -eq 0 ]] && runreverse $2 $3; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
-
-elif [[ "$whichp" == "-strlen" ]]; then 
+    if [[ $? -eq 0 ]]; then 
+        runreverse $2 $3; exitt $?
+    else
+        echo "$modulenotloaded"; exitt $nomodulecode
+    fi
+elif [[ "$whichp" == "strlen" ]]; then 
     if [[ -z ${2+x} ]]; then
         echo "You have not provided any string to calculate"
         exitt 35
@@ -143,23 +152,28 @@ elif [[ "$whichp" == "-strlen" ]]; then
         echo ${#2}  
     fi  
 
-elif [[ "$1" == "-log" ]]; then 
+elif [[ "$1" == "log" ]]; then 
     checksource $logsource
-    [[ $? -eq 0 ]] && runlog; exitt $? || echo "$modulenotloaded"; exitt $nomodulecode
-
-elif [[ "$whichp" == "-exit" ]]; then
+    if [[ $? -eq 0 ]]; then 
+        runlog; exitt $?
+    else 
+        echo "$modulenotloaded"; exitt $nomodulecode
+    fi
+elif [[ "$whichp" == "exit" ]]; then
     if [[ -z ${2+x} ]]; then
         echo "You have not provided any exit code, the default wiil be 0"
     elif [[ ! $2 =~ $re ]]; then
-        echo "Exit code you entered is not a valid number(default wiil be 0), please refer to -help command"
+        echo "Exit code you entered is not a valid number(default wiil be 0), please refer to help command"
+    elif [[ "$1" -ge "0" && "$1" -le "244" ]]; then
+        echo "Your exit code is not between range of [0-244], exit code will be default(0)"
     fi
     exitt $2
 
-elif [[ "$whichp" == "-help" ]]; then
+elif [[ "$whichp" == "help" ]]; then
     help
     exitt $?
 
-elif [[ "$whichp" == "-interactive" ]]; then
+elif [[ "$whichp" == "interactive" ]]; then
     ever=0
     while [ $ever -eq 0 ]  
     do
@@ -170,7 +184,7 @@ elif [[ "$whichp" == "-interactive" ]]; then
         if [[ $uscom == "c" ]]; then
             checksource $calcsource 
             if [[ $? -eq 0 ]]; then
-                echo "Please chose an operation and provide 2 numbers to calculate. Example: -sum 1 2"
+                echo "Please chose an operation and provide 2 numbers to calculate. Example: sum 1 2"
                 echo
                 read calcthing
                 IFS=' '
@@ -228,11 +242,15 @@ elif [[ "$whichp" == "-interactive" ]]; then
         elif [[ $uscom == "len" ]]; then
             echo "You entered strlen mode. Please enter a string to get its length (Use quotes like this: \"yoursting\"):"
             read lenstr
+            if [[ $lenstr == \"* && $lenstr == *\" ]]; then
             temp=${#lenstr}
             temp=$(($temp-2))
             echo $temp
             echo 
-            echo $returnmes     
+            echo $returnmes  
+            else 
+                echo "Wrong string format"
+            fi   
         elif [[ $uscom == "h" ]]; then
             echo "You entered help."
             help
@@ -241,13 +259,13 @@ elif [[ "$whichp" == "-interactive" ]]; then
         fi
     else
         echo
-        echo "You entered nonvalid command, please refer -help command"
+        echo "You entered nonvalid command, please refer to help command"
     fi
     done
 elif [[ -z "$whichp" ]]; then
-    echo "You have not provided any arguments, please refer to -help command"
+    echo "You have not provided any arguments, please refer to help command"
     exitt 35
 else    
-    echo "There is no such a command, to see available commands please refer to -help command"
+    echo "There is no such a command, to see available commands please refer to help command"
     exitt 10
 fi
