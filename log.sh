@@ -3,7 +3,7 @@
 #Need to add code which can show more then oneline string?????
 
 
-logfile="var/log/anaconda/X.log"
+logfile="/var/log/anaconda/X.log"
 warningreg="(WW)"
 informationreg="(II)"
 excetion1="(EE)"
