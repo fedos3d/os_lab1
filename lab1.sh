@@ -153,7 +153,9 @@ elif [[ "$whichp" == "reverse" ]]; then
         echo "$modulenotloaded"; exitt $nomodulecode
     fi
 elif [[ "$whichp" == "strlen" ]]; then 
-    if [[ -z ${2+x} ]]; then
+    if [[ ! -z $3 ]]; then
+        echo "You entered more than one string"
+    elif [[ -z ${2+x} ]]; then
         echo "You have not provided any string to calculate"
         exitt 35
     else
